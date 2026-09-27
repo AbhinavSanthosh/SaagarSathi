@@ -75,35 +75,54 @@ npm run dev              # → http://localhost:5173  (or: npm run dev:all for b
 
 ---
 
-## 3. Architecture — deterministic core, LLM only at the edge
+## 3. System architecture — deterministic core, LLM only at the edge
 
-Following the research consensus for life-safety systems, the safety verdict is **computed, never generated**:
+Following the research consensus for life-safety systems, the safety verdict is **computed, never generated**.
+Specialist tools gather evidence in parallel, a validator checks it, a rule engine decides, and the
+language model is allowed only to *narrate* the pre-computed result.
 
+```mermaid
+flowchart TD
+    U["🎤 Fisherman<br/>voice or text · 9 Indian languages"] --> IP["INPUT PROCESSOR<br/>script + spoken-language detect<br/>location · intent"]
+    IP --> ORCH["ORCHESTRATOR<br/>parallel fan-out · shared pipeline object"]
+    ORCH --> W["🌊 Weather / Ocean tool<br/>Open-Meteo live forecast + marine"]
+    ORCH --> P["🐟 PFZ / Fishing tool<br/>SST + chlorophyll front analysis"]
+    ORCH --> G["🧭 Geo / Border tool<br/>IMBL segments · MPA polygons"]
+    W --> DV["DATA VALIDATOR<br/>freshness · units · completeness · agreement"]
+    P --> DV
+    G --> DV
+    DV --> SRE["🛡️ SAFETY RULE ENGINE<br/>deterministic · auditable"]
+    SRE --> SR["SAFETY RESULT<br/>SAFE · CAUTION · HIGH RISK · DANGER<br/>score + factors + advice"]
+    SRE --> FO["🎣 FISHING OPPORTUNITY<br/>PFZ score · zone · validity"]
+    SR --> LLM["💬 LLM EXPLAINER · NVIDIA NIM<br/>narrates only · verdict-first · same language"]
+    FO --> LLM
+    LLM --> LV["🔊 LANGUAGE / VOICE<br/>Bhashini TTS reply + translated UI"]
+    LV --> ANS["📱 Answer · map · why-trail · audit log"]
+    style SRE fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style SR fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    style LLM fill:#e0f2fe,stroke:#0284c7,stroke-width:2px
 ```
-Voice / Text query (any of 9 languages)
-        │
- INPUT PROCESSOR — script detection, UI/voice language, location, intent
-        │
- ORCHESTRATOR ── fans out in parallel ──────────────┐
-        │                                            │
- WEATHER/OCEAN TOOL   PFZ/FISHING TOOL   GEO/BORDER TOOL
- (Open-Meteo live      (SST+chlorophyll   (IMBL segments,
-  forecast + marine)    front analysis)    MPA polygons)
-        │                                            │
- DATA VALIDATOR — freshness, units/ranges, completeness, source agreement
-        │
- SAFETY RULE ENGINE — deterministic rules → SAFE / CAUTION / HIGH RISK / DANGER
-        │
- ┌──────┴─────────────────────────┐
- SAFETY RESULT               FISHING OPPORTUNITY   (kept separate: a DANGER
- (level, score, factors,      (PFZ score, zone,     verdict is never diluted
-  advice, confidence)          validity)            by a good fishing score)
- └──────┬─────────────────────────┘
- LLM EXPLAINER (NVIDIA NIM) — narrates ONLY: verdict-first answer in the
- user's language, exact numbers, sea-feel wording, tip, INCOIS/IMD reminder
-        │
- LANGUAGE / VOICE — Bhashini TTS audio reply + translated UI
-```
+
+**Worked example** — *"Is it safe for fishing today?"* (spoken in Hindi, UI in English):
+
+1. Input processor detects Devanagari → language `hi`, intent `safety`, location Kochi.
+2. Orchestrator pulls wind/waves (Weather), SST/chlorophyll zones (PFZ), IMBL distance (Geo) in parallel.
+3. Validator confirms fresh, in-range, complete data; Rule Engine scores it → `CAUTION (24/100)`.
+4. Safety Result and Fishing Opportunity are built as **separate objects** — the good PFZ score can never dilute the CAUTION call.
+5. The LLM Explainer narrates in Hindi, verdict first, numbers quoted exactly, sea-feel wording, one practical tip.
+6. Bhashini speaks the Hindi reply aloud; the dashboard shows the same verdict with its evidence trail.
+
+**Where each stage lives in this repo:**
+
+| Pipeline stage | Code |
+|---|---|
+| Input processor, spoken-language + Hindi/Marathi disambiguation | `server/agents/langDetect.js` |
+| Weather / Ocean / PFZ / Geo / Validator / Rule Engine / bulletins | `server/agents/index.js` |
+| Orchestrator + REST API | `server/index.js` (`/api/orchestrator`) |
+| LLM Explainer (intent router + verdict-first prompts + NVIDIA client) | `server/agents/nvidiaExplainer.js` |
+| Bhashini NMT / TTS / ASR + validated multi-model speech race | `server/agents/bhashiniClient.js` |
+| Voice capture, live transcript, stop/Enter handling | `src/lib/useVoiceAgent.ts`, `src/lib/voiceApi.ts` |
+| Dashboard · Ocean Map · Chat · Research UI | `src/pages/`, `src/components/OceanMap.tsx` |
 
 Key design decisions:
 - **One verdict, two objects.** Safety and fishing opportunity travel separately so an attractive PFZ can never soften a DANGER call.
