@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ocean-50: #f0f9ff;
+  --color-ocean-100: #e0f2fe;
+  --color-ocean-200: #bae6fd;
+  --color-ocean-300: #7dd3fc;
+  --color-ocean-400: #38bdf8;
+  --color-ocean-500: #0ea5e9;
+  --color-ocean-600: #0284c7;
+  --color-ocean-700: #0369a1;
+  --color-ocean-800: #075985;
+  --color-ocean-900: #0c4a6e;
+  --color-ocean-950: #082f49;
+  --color-sky-150: #e8f4fc;
+  --color-sea-50: #f0fdfa;
+  --color-sea-100: #ccfbf1;
+  --color-sea-500: #14b8a6;
+  --color-sea-600: #0d9488;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-safe: #10b981;
+  --color-highrisk: #f97316;
+  --color-abyss: #06121f;
+  --font-sans: 'Inter', 'Roboto', system-ui, sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Slim subtle ocean scrollbars */
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Leaflet Ocean Map Overrides */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #e0f2fe !important;
+}
+
+.leaflet-control-zoom {
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 4px 12px -2px rgba(2, 132, 199, 0.08) !important;
+}
+
+.leaflet-control-zoom a {
+  color: #0369a1 !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #f0f9ff !important;
+  color: #0284c7 !important;
+}
+
+/* Modern Ocean-Themed Leaflet Layers Control */
+.leaflet-control-layers {
+  border-radius: 14px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
+  padding: 10px 14px !important;
+  font-family: var(--font-sans);
+  font-size: 12px !important;
+  color: #1e293b !important;
+}
+
+.leaflet-control-layers-toggle {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  background-size: 20px 20px !important;
+  box-shadow: 0 4px 12px -2px rgba(2, 132, 199, 0.12) !important;
+}
+
+.leaflet-control-layers-expanded {
+  padding: 12px 16px !important;
+}
+
+.leaflet-control-layers-base label,
+.leaflet-control-layers-overlays label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 4.5px 0 !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  color: #334155 !important;
+  transition: color 0.15s ease;
+}
+
+.leaflet-control-layers-base label:hover,
+.leaflet-control-layers-overlays label:hover {
+  color: #0284c7 !important;
+}
+
+.leaflet-control-layers-separator {
+  border-top: 1px solid #e2e8f0 !important;
+  margin: 7px 0 !important;
+}
+
+.leaflet-control-layers input[type="radio"],
+.leaflet-control-layers input[type="checkbox"] {
+  accent-color: #0284c7 !important;
+  cursor: pointer !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+}
+
+/* Custom ocean animations */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes ocean-wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-wave {
+  animation: ocean-wave 3s ease-in-out infinite;
+}
