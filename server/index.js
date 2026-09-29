@@ -1,9 +1,9 @@
 const path = require('path');
 // Canonical key location: saagarsathi/server/.env (loaded first, wins).
 // Falls back to saagarsathi/.env and CWD .env when present; missing files are skipped.
-require('dotenv').config({ path: path.join(__dirname, '.env') });
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
-require('dotenv').config();
+//require('dotenv').config({ path: path.join(__dirname, '.env') });
+//require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+//require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
@@ -335,14 +335,4 @@ app.get('/', (req, res) => res.json({ name: 'SaagarSathi ORCA server', ok: true,
 
 // JSON 404 for unknown API routes (Express default would send HTML).
 app.use('/api', (req, res) => res.status(404).json({ error: `Unknown endpoint: ${req.method} ${req.path}` }));
-
-const server = app.listen(PORT, () => console.log(`SaagarSathi server listening on port ${PORT} (llm-nvidia:${hasLlmKey() ? 'on' : 'fallback — add NVIDIA_API_KEY to server/.env'})`));
-// Friendly error when the port is already taken (e.g. an old server is still
-// running): previously this crashed with a raw EADDRINUSE stack trace.
-server.on('error', (err) => {
-    if (err && err.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use — another SaagarSathi server is probably still running. Stop it (or run: Get-Process node | Stop-Process) and start again.`);
-        process.exit(1);
-    }
-    throw err;
-});
+module.exports = app;
