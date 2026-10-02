@@ -173,7 +173,18 @@ tool interface without touching the orchestrator.
 ## 6. Scripts & health
 
 - Frontend: `npm run dev` · `npm run dev:all` (frontend + backend) · `npm run build` · `npm run lint`
-- Backend: `node index.js` · `GET /api/health` reports `{ llm, bhashini }` status live.
+- Backend: `node server/index.js` · `GET /api/health` reports `{ llm, bhashini }` status live.
+
+## 7. Deploy to Vercel (single build)
+
+The project is configured so one Vercel deployment builds and serves both the Vite frontend and the Express API:
+
+1. Push this repo to GitHub and import it on [vercel.com](https://vercel.com).
+2. Set the **Framework Preset** to **Vite** and leave the build command as `npm run build`.
+3. Add any required environment variables in the Vercel dashboard:
+   - `NVIDIA_API_KEY` (optional — LLM explainer)
+   - `BHASHINI_USER_ID`, `BHASHINI_ULCA_API_KEY`, `BHASHINI_INFERENCE_API_KEY` (optional — server voice/translation)
+4. Deploy. Vercel will build the static UI from `dist/` and route `/api/*` to the serverless function in `api/index.js`.
 
 ## 7. Safety framing
 

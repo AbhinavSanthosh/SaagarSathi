@@ -17,8 +17,12 @@ function apiBase(): string {
 }
 
 export async function apiGet<T>(path: string): Promise<T> {
+  const base = apiBase();
+  // In production / Vercel we rely on same-origin /api routes.
+  // Only fall back to localhost when VITE_API_URL is explicitly set (local dev).
+  const urls: string[] = base ? [`${base}${path}`, `${DIRECT_FALLBACK}${path}`] : [path];
   let lastErr: unknown = null;
-  for (const url of [`${apiBase()}${path}`, `${DIRECT_FALLBACK}${path}`]) {
+  for (const url of urls) {
     try {
       const r = await fetch(url);
       if (!r.ok) throw new Error(`HTTP ${r.status} from ${url}`);
@@ -31,8 +35,10 @@ export async function apiGet<T>(path: string): Promise<T> {
 }
 
 export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+  const base = apiBase();
+  const urls: string[] = base ? [`${base}${path}`, `${DIRECT_FALLBACK}${path}`] : [path];
   let lastErr: unknown = null;
-  for (const url of [`${apiBase()}${path}`, `${DIRECT_FALLBACK}${path}`]) {
+  for (const url of urls) {
     try {
       const r = await fetch(url, {
         method: 'POST',
@@ -51,5 +57,6 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   throw lastErr instanceof Error ? lastErr : new Error('API unreachable');
 }
 
-export const BACKEND_HINT =
-  'Backend is not reachable. Start it first: open a 2nd terminal → cd saagarsathi/server → npm install → node index.js (or: npm start). Then keep it running and Retry. Health check: http://localhost:3000/api/health';
+export const BACKEND_HINT = apiBase()
+  ? 'Backend is not reachable. Check the VITE_API_URL configuration and that the API server is running.'
+  : 'Backend is not reachable. If you are running locally, start it first: open a 2nd terminal → cd server → npm install → node index.js (or: npm start). Then keep it running and Retry. Health check: http://localhost:3000/api/health';

@@ -335,4 +335,14 @@ app.get('/', (req, res) => res.json({ name: 'SaagarSathi ORCA server', ok: true,
 
 // JSON 404 for unknown API routes (Express default would send HTML).
 app.use('/api', (req, res) => res.status(404).json({ error: `Unknown endpoint: ${req.method} ${req.path}` }));
+
+// Start the server when running directly (local dev). Vercel imports this file
+// as a serverless function and supplies its own request handling, so the
+// exported app remains the public contract.
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`SaagarSathi server running on port ${PORT}`);
+    });
+}
+
 module.exports = app;
